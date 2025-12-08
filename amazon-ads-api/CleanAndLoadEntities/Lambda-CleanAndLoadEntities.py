@@ -26,6 +26,7 @@ def get_file_meta_data(file_event):
 
 
 if __name__ == "__main__":
+    
     parser = argparse.ArgumentParser(description="BigQuery Clean And Load Ads API Entities Data")
 
     parser.add_argument("-", "--entity", help="Entity", default='sp_p')

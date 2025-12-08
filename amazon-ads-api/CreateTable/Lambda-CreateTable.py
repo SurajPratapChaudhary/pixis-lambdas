@@ -273,6 +273,7 @@ def lambda_handler(event, context):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Create Tables for Ads API (BigQuery or Postgres)")
+    
     parser.add_argument("-a", "--action", help="Action", default='create_table')
     parser.add_argument("-cid", "--client_id", help="Client Id", default=1)
     parser.add_argument("-pt", "--profile_type", help="Profile Type", default='seller')
