@@ -11,6 +11,7 @@ aws_access_key = os.environ.get('AWS_ACCESS_KEY', None)
 aws_secret_key = os.environ.get('AWS_SECRET_KEY', None)
 aws_region = os.environ.get('AWS_REGION', 'us-east-1')
 subnet_ids = os.environ.get("ECS_SUBNETS", "").split(",")
+
 security_groups = os.environ.get("ECS_SECURITY_GROUPS", "").split(",")
 
 def get_queue_config_data():
