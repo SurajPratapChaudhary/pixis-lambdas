@@ -15,7 +15,7 @@ RUN pip install -r requirements.txt
 # Copy function code
 COPY ./amazon-ads-api/CreateTable/ .
 COPY ./amazon-ads-api/includes/ ./includes
-COPY ./amazon-ads-api/bq-credentials-peakroas.json .
+RUN touch bq-credentials-peakroas.json
 
 # Set the CMD to your handler
 CMD [ "Lambda-CreateTable.lambda_handler" ]
