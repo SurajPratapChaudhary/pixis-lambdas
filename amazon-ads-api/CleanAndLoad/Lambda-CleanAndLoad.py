@@ -32,7 +32,6 @@ def get_file_meta_data(file_event):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="BigQuery Clean And Load Ads API")
-
     parser.add_argument("-k", "--key", help="Key", default='custom')
     parser.add_argument("-r", "--report", help="Report", default='campaign')
     parser.add_argument("-s", "--start_date", help="Start Date", default='20251012')
