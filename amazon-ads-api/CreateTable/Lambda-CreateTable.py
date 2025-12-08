@@ -175,9 +175,14 @@ def lambda_handler(event, context):
         event['action'] = 'create_table'
 
     if 'table_type' not in event:
+        table_types = ''
+    else:
+        table_types = event['table_type']
+
+    if table_types == '':
         table_types = [Constant.TBL_TYPE_REPORT, Constant.TBL_TYPE_ENTITY]
     else:
-        table_types = event['table_type'].split(',')
+        table_types = table_types.split(',')
 
     if 'client_id' not in event:
         event['client_id'] = ''
@@ -273,11 +278,11 @@ def lambda_handler(event, context):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Create Tables for Ads API (BigQuery or Postgres)")
-    
+
     parser.add_argument("-a", "--action", help="Action", default='create_table')
     parser.add_argument("-cid", "--client_id", help="Client Id", default=1)
     parser.add_argument("-pt", "--profile_type", help="Profile Type", default='seller')
-    parser.add_argument("-tt", "--table_type", help="Table Type", default='general')
+    parser.add_argument("-tt", "--table_type", help="Table Type", default='')
     parser.add_argument("-at", "--ad_type", help="Ad Type", default='')
     parser.add_argument("-tbl", "--tables", help="Table Names", default='')
     parser.add_argument("-bkt", "--bucket", help="Bucket Name", default='')
@@ -286,13 +291,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     event = {
-        'action': args.action,
-        'client_id': args.client_id,
-        'profile_type': args.profile_type,
-        "table_type": args.table_type,
-        "ad_type": args.ad_type,
-        "tables": args.tables,
-        'bucket': args.bucket,
-        'db_connection': args.db_connection
+    "profile_type": args.profile_type,
+    "client_id": args.client_id,
+    "table_type": ""
     }
     lambda_handler(event, "abc")

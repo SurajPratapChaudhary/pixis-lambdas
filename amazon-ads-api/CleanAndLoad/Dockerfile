@@ -14,7 +14,7 @@ RUN pip install -r requirements.txt
 # Copy function code
 COPY ./amazon-ads-api/CleanAndLoad/ .
 COPY ./amazon-ads-api/includes ./includes
-RUN touch bq-credentials-peakroas.json
+RUN touch bq-credentials.json
 
 # Set the CMD to your handler
 CMD [ "Lambda-CleanAndLoad.lambda_handler" ]
