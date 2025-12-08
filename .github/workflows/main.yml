@@ -1,0 +1,116 @@
+name: Build & Deploy Amazify Lambdas (OIDC)
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  id-token: write   # required for OIDC
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ADS_ECR_REPOSITORY_CREATE: ads-api-create-tables
+  ADS_ECR_REPOSITORY_CLEAN: ads-api-clean-and-load
+  ADS_ECR_REPOSITORY_CLEAN_ENTITIES: ads-api-clean-and-load-entities
+  ECR_REPOSITORY_QUEUE_SCALING: queue-worker-scaling
+
+jobs:
+  build-and-push:
+    name: Build & Push Lambda Images to ECR
+    runs-on: ubuntu-latest
+    environment: Production   # <-- this makes environment secrets available
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: get-changed-files
+        run: |
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }}
+
+      - name: Count changed files in multiple folders
+        id: count-changes
+        run: bash ./scripts/count_changes.sh ${{ github.sha }} amazon-ads-api/CreateTable amazon-ads-api/CleanAndLoad amazon-ads-api/CleanAndLoadEntities amazon-ads-api/includes queue-worker-scaling
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+
+      # ---------- OIDC auth to AWS ----------
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::411474509117:role/github-deployment-role
+          role-session-name: gha-lambda-deploy
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Automatic Tagging of Releases
+        id: increment-git-tag
+        run: |
+          bash ./build/git_update.sh -v major
+
+      # ---------- ADS CreateTable ----------
+      - name: Build, Tag, Push & Deploy - ADS CreateTable
+        if: ${{ steps.count-changes.outputs.amazon_ads_api_CreateTable_count > 0 || steps.count-changes.outputs.amazon_ads_api_includes_count > 0 }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+          LAMBDA_FUNCTION_NAME: ads-api-create-tables
+        run: |
+          echo "🚀 Starting ADS CreateTable build and deployment..."
+          bash ./scripts/build_tag_push.sh \
+            -r "${{ env.ECR_REGISTRY }}/${{ env.ADS_ECR_REPOSITORY_CREATE }}" \
+            -t "${{ env.IMAGE_TAG }}" \
+            -f "amazon-ads-api/CreateTable/Dockerfile" \
+            -n "${{ env.LAMBDA_FUNCTION_NAME }}"
+
+      # ---------- ADS CleanAndLoad ----------
+      - name: Build, Tag, Push & Deploy - ADS CleanAndLoad (Reports)
+        if: ${{ steps.count-changes.outputs.amazon_ads_api_CleanAndLoad_count > 0 || steps.count-changes.outputs.amazon_ads_api_includes_count > 0 }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+          LAMBDA_FUNCTION_NAME: ads-api-clean-and-load
+        run: |
+          echo "🚀 Starting ADS CleanAndLoad build and deployment..."
+          bash ./scripts/build_tag_push.sh \
+            -r "${{ env.ECR_REGISTRY }}/${{ env.ADS_ECR_REPOSITORY_CLEAN }}" \
+            -t "${{ env.IMAGE_TAG }}" \
+            -f "amazon-ads-api/CleanAndLoad/Dockerfile" \
+            -n "${{ env.LAMBDA_FUNCTION_NAME }}"
+    
+      # ---------- ADS CleanAndLoad Entities ----------
+      - name: Build, Tag, Push & Deploy - ADS CleanAndLoad (Entities)
+        if: ${{ steps.count-changes.outputs.amazon_ads_api_CleanAndLoadEntities_count > 0 || steps.count-changes.outputs.amazon_ads_api_includes_count > 0 }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+          LAMBDA_FUNCTION_NAME: ads-api-clean-and-load-entities
+        run: |
+          echo "🚀 Starting ADS CleanAndLoad Entities build and deployment..."
+          bash ./scripts/build_tag_push.sh \
+            -r "${{ env.ECR_REGISTRY }}/${{ env.ADS_ECR_REPOSITORY_CLEAN_ENTITIES }}" \
+            -t "${{ env.IMAGE_TAG }}" \
+            -f "amazon-ads-api/CleanAndLoadEntities/Dockerfile" \
+            -n "${{ env.LAMBDA_FUNCTION_NAME }}"
+    
+      # ---------- Queue Worker Scaling ----------
+      - name: Build, Tag, Push & Deploy - Queue Worker Scaling
+        if: ${{ steps.count-changes.outputs.queue_worker_scaling_count > 0 }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+          LAMBDA_FUNCTION_NAME: queue-worker-scaling
+        run: |
+          echo "🚀 Starting Queue Worker Scaling build and deployment..."
+          bash ./scripts/build_tag_push.sh \
+            -r "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_QUEUE_SCALING }}" \
+            -t "${{ env.IMAGE_TAG }}" \
+            -f "queue-worker-scaling/Dockerfile" \
+            -n "${{ env.LAMBDA_FUNCTION_NAME }}"
