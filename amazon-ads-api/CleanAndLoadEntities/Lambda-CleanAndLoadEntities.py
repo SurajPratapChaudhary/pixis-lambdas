@@ -31,7 +31,6 @@ if __name__ == "__main__":
     parser.add_argument("-", "--entity", help="Entity", default='sp_p')
     args = parser.parse_args()
     entity = args.entity
-
     keys = {
         'sp_c': f"amazon-ads-api/entities/SP/campaign/US/1/794003192585523/campaign.json.gz",
         'sp_a': f"amazon-ads-api/entities/SP/adgroup/US/1/794003192585523/adgroup.json.gz",
