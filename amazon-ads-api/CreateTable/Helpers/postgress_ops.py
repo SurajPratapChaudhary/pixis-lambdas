@@ -89,7 +89,7 @@ class PostgresOps(object):
                 print(f"Creating PG table {schema_name}.{table_name}")
                 cur.execute(create_table_stmt)
 
-                if partitionColumn:
+                if partitionColumn is not None:
                     # Create index on the partition column to support time-based queries
                     index_name = f"{table_name}_{partitionColumn}_idx"
                     cur.execute(

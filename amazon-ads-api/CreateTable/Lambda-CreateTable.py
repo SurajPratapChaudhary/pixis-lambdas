@@ -210,6 +210,8 @@ def lambda_handler(event, context):
 
     if action == 'create_table' or action == 'delete-create_table':
 
+        print("action: {} - db_connection: {}".format(action, db_connection))
+
         for table_type in table_types:
 
             ad_types = TableConfig.getAdTypes(table_type,ad_types)
@@ -289,6 +291,8 @@ if __name__ == "__main__":
     event = {
     "channel_type": args.channel_type,
     "account_id": args.account_id,
-    "table_type": ""
+    "table_type": "",
+    'action': args.action,
+    'db_connection': args.db_connection
     }
     lambda_handler(event, "abc")

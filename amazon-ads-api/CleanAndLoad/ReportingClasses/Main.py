@@ -294,10 +294,10 @@ class AdsApiReportProcessor(BaseFileProcessor):
         # Ensure a unique index exists for upsert keys (optional but recommended)
         idx = f'{target_table}_bk_uniq'
         idx_cols = ", ".join([f'"{c}"' for c in key_cols])
-        try:
-            cur.execute(f'CREATE UNIQUE INDEX IF NOT EXISTS "{idx}" ON "{target_schema_name}"."{target_table}" ({idx_cols})')
-        except Exception as e:
-            self.printlog(f"Warning: could not ensure unique index for upsert keys {key_cols}: {e}")
+        # try:
+        #     cur.execute(f'CREATE UNIQUE INDEX IF NOT EXISTS "{idx}" ON "{target_schema_name}"."{target_table}" ({idx_cols})')
+        # except Exception as e:
+        #     self.printlog(f"Warning: could not ensure unique index for upsert keys {key_cols}: {e}")
 
         # Build ON CONFLICT DO UPDATE clause
         if non_key_cols:
