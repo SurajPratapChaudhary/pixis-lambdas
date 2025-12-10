@@ -163,12 +163,20 @@ def dispatch_etl_jobs(profile_id):
 
 def lambda_handler(event, context):
 
-    if 'profile_type' not in event:
-        event['profile_type'] = ''
+    if 'channel_type' not in event:
+        event['channel_type'] = ''
 
-    profile_type = event['profile_type']
-    if profile_type == '':
-        print("Profile type is not specified to create tables.")
+    channel_type = event['channel_type']
+    if channel_type == '':
+        print("Channel type is not specified to create tables.")
+        return
+
+    if 'account_id' not in event:
+        event['account_id'] = ''
+
+    account_id = event['account_id']
+    if account_id == '':
+        print("Account id is not specified to create tables.")
         return
 
     if 'action' not in event:
@@ -184,9 +192,6 @@ def lambda_handler(event, context):
     else:
         table_types = table_types.split(',')
 
-    if 'client_id' not in event:
-        event['client_id'] = ''
-
     if 'tables' not in event:
         tables = []
     else:
@@ -200,26 +205,22 @@ def lambda_handler(event, context):
     if 'run_etl' not in event:
         event['run_etl'] = False
 
-    if 'profile_id' not in event:
-        event['profile_id'] = ''
-
     action = event['action']
     db_connection = event.get('db_connection', os.getenv('DB_CONNECTION', 'pg')).lower()
 
     if action == 'create_table' or action == 'delete-create_table':
-        client_id = event['client_id']
 
         for table_type in table_types:
 
             ad_types = TableConfig.getAdTypes(table_type,ad_types)
 
-            print("{} - {} ad types -> {}".format(profile_type, table_type, ad_types))
+            print("{} - {} ad types -> {}".format(channel_type, table_type, ad_types))
 
             for ad_type in ad_types:
 
                 tableNames = TableConfig.getTableNames(table_type,ad_type,givenTables=tables)
 
-                print("client id: {} - ad_type -> {} - table type -> {} - table names -> {}".format(client_id,
+                print("account id: {} - ad_type -> {} - table type -> {} - table names -> {}".format(account_id,
                 ad_type,
                 table_type,
                 tableNames))
@@ -230,7 +231,7 @@ def lambda_handler(event, context):
 
                     tableName = tableConfig.getTableName()
                     if table_type != Constant.TBL_TYPE_GENERAL:
-                        tableName = "{}_{}".format(tableName, client_id)
+                        tableName = "{}_{}".format(tableName, account_id)
 
                     ops = PostgresOps() if db_connection == 'pg' else BigQuery()
                     if action == 'delete-create_table':
@@ -242,11 +243,6 @@ def lambda_handler(event, context):
                         partitionColumn=tableConfig.getPartitionColumn(),
                         clusterColumn=tableConfig.getClusterColumn()
                     )
-
-        # dispatch the etl jobs for the new created client
-        if event['run_etl']:
-            print("Dispatching job for Client [{}] Profile [{}]".format(client_id, event['profile_id']))
-            dispatch_etl_jobs(event['profile_id'])
 
     # elif action == 'fix_schema':
     #     client_id = event['client_id']
@@ -280,8 +276,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create Tables for Ads API (BigQuery or Postgres)")
 
     parser.add_argument("-a", "--action", help="Action", default='create_table')
-    parser.add_argument("-cid", "--client_id", help="Client Id", default=1)
-    parser.add_argument("-pt", "--profile_type", help="Profile Type", default='seller')
+    parser.add_argument("-aid", "--account_id", help="Account Id", default=1)
+    parser.add_argument("-ct", "--channel_type", help="Channel Type", default='amazon')
     parser.add_argument("-tt", "--table_type", help="Table Type", default='')
     parser.add_argument("-at", "--ad_type", help="Ad Type", default='')
     parser.add_argument("-tbl", "--tables", help="Table Names", default='')
@@ -291,8 +287,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     event = {
-    "profile_type": args.profile_type,
-    "client_id": args.client_id,
+    "channel_type": args.channel_type,
+    "account_id": args.account_id,
     "table_type": ""
     }
     lambda_handler(event, "abc")

@@ -26,6 +26,8 @@ class Constant:
     ADS_ADGROUP = 'adgroup'
     ADS_KEYWORD = 'keyword'
     ADS_TARGET = 'target'
+    ADS_AD = 'ad'
+    ADS_PRODUCTAD = 'productad'
 
     ADS_CAMPAIGN_PLACEMENT = 'campaign_placement'
     ADS_CAMPAIGN_V2 = 'campaign_v2'

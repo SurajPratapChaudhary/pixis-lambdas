@@ -34,10 +34,22 @@ if __name__ == "__main__":
     entity = args.entity
     keys = {
         'sp_c': f"amazon-ads-api/entities/SP/campaign/US/1/794003192585523/campaign.json.gz",
-        'sp_a': f"amazon-ads-api/entities/SP/adgroup/US/1/794003192585523/adgroup.json.gz",
+        'sp_ag': f"amazon-ads-api/entities/SP/adgroup/US/1/794003192585523/adgroup.json.gz",
         'sp_t': f"amazon-ads-api/entities/SP/target/US/1/794003192585523/target.json.gz",
         'sp_k': f"amazon-ads-api/entities/SP/keyword/US/1/794003192585523/keyword.json.gz",
         'sp_p': f"amazon-ads-api/entities/SP/portfolio/US/1/794003192585523/portfolio.json.gz",
+        'sp_pa': f"amazon-ads-api/entities/SP/productad/US/1/794003192585523/productad.json.gz",
+
+        'sb_c': f"amazon-ads-api/entities/SB/campaign/US/1/794003192585523/campaign.json.gz",
+        'sb_ag': f"amazon-ads-api/entities/SB/adgroup/US/1/794003192585523/adgroup.json.gz",
+        'sb_t': f"amazon-ads-api/entities/SB/target/US/1/794003192585523/target.json.gz",
+        'sb_k': f"amazon-ads-api/entities/SB/keyword/US/1/794003192585523/keyword.json.gz",
+        'sb_a': f"amazon-ads-api/entities/SB/ad/US/1/794003192585523/ad.json.gz",
+
+        'sd_c': f"amazon-ads-api/entities/SD/campaign/US/1/794003192585523/campaign.json.gz",
+        'sd_ag': f"amazon-ads-api/entities/SD/adgroup/US/1/794003192585523/adgroup.json.gz",
+        'sd_t': f"amazon-ads-api/entities/SD/target/US/1/794003192585523/target.json.gz",
+        'sd_pa': f"amazon-ads-api/entities/SD/productad/US/1/794003192585523/productad.json.gz",
     }
 
     if entity != '':
