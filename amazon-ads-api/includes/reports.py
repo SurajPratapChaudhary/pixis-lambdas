@@ -42,8 +42,8 @@ ENTITIES = {
         Constant.ADS_PORTFOLIO: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'portfolioId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'portfolioId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sp',
             'tableName': 'entities_portfolio',
             'schema': {
@@ -65,8 +65,8 @@ ENTITIES = {
         Constant.ADS_CAMPAIGN: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sp',
             'tableName': 'entities_campaign',
             'schema': {
@@ -92,8 +92,8 @@ ENTITIES = {
         Constant.ADS_ADGROUP: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sp',
             'tableName': 'entities_adgroup',
             'schema': {
@@ -113,8 +113,8 @@ ENTITIES = {
         Constant.ADS_KEYWORD: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'keywordId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'keywordId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sp',
             'tableName': 'entities_keyword',
             'schema': {
@@ -136,8 +136,8 @@ ENTITIES = {
         Constant.ADS_TARGET: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'targetId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'targetId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sp',
             'tableName': 'entities_target',
             'schema': {
@@ -160,8 +160,8 @@ ENTITIES = {
         Constant.ADS_PRODUCTAD: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'adId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'adId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sp',
             'tableName': 'entities_productad',
             'schema': {
@@ -184,8 +184,8 @@ ENTITIES = {
         Constant.ADS_CAMPAIGN: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sb',
             'tableName': 'entities_campaign',
             'schema': {
@@ -213,8 +213,8 @@ ENTITIES = {
         Constant.ADS_ADGROUP: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sb',
             'tableName': 'entities_adgroup',
             'schema': {
@@ -234,8 +234,8 @@ ENTITIES = {
         Constant.ADS_KEYWORD: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'keywordId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'keywordId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sb',
             'tableName': 'entities_keyword',
             'schema': {
@@ -253,8 +253,8 @@ ENTITIES = {
         Constant.ADS_TARGET: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'targetId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'targetId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sb',
             'tableName': 'entities_target',
             'schema': {
@@ -272,8 +272,8 @@ ENTITIES = {
         Constant.ADS_AD: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'adId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'adId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sb',
             'tableName': 'entities_ad',
             'schema': {
@@ -297,8 +297,8 @@ ENTITIES = {
         Constant.ADS_CAMPAIGN: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sd',
             'tableName': 'entities_campaign',
             'schema': {
@@ -320,8 +320,8 @@ ENTITIES = {
         Constant.ADS_ADGROUP: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sd',
             'tableName': 'entities_adgroup',
             'schema': {
@@ -340,8 +340,8 @@ ENTITIES = {
         Constant.ADS_TARGET: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'targetId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'targetId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sd',
             'tableName': 'entities_target',
             'schema': {
@@ -360,8 +360,8 @@ ENTITIES = {
         Constant.ADS_PRODUCTAD: {
             'partitionColumn': None,
             'clusterColumn': ['profileId', 'adId', 'adGroupId', 'campaignId'],
-            'loadMethod': 'merge',
-            'mergeColumns': ['profileId', 'adId', 'adGroupId', 'campaignId'],
+            'loadMethod': 'delete_insert',
+            'mergeColumns': ['profileId'],
             'dataset': 'ads_sd',
             'tableName': 'entities_productad',
             'schema': {
