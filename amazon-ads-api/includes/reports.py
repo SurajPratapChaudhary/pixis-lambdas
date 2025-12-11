@@ -1824,17 +1824,19 @@ REPORTS = {
 
 
 def normalize_column_name(column):
-    column = column.replace(" (", "(")
-    column = column.replace("( ", "(")
-    column = column.replace(" )", ")")
-    column = column.replace(") ", ")")
-    if column.endswith(")"):
-        column = column[:-1]
-
-    column = re.sub(r'[\s\-()\[\]{}]', '_', column)
-    column = re.sub(r'[,./]', '', column)
-
-    return column
+    # print("normalizing column {}".format(column))
+    normalized_column = column
+    if isinstance(column, list):
+        return [normalize_column_name(item) for item in column]
+    normalized_column = normalized_column.replace(" (", "(")
+    normalized_column = normalized_column.replace("( ", "(")
+    normalized_column = normalized_column.replace(" )", ")")
+    normalized_column = normalized_column.replace(") ", ")")
+    if normalized_column.endswith(")"):
+        normalized_column = normalized_column[:-1]
+    normalized_column = re.sub(r'[\s\-()\[\]{}?]', '_', normalized_column)
+    normalized_column = re.sub(r'[,./]', '', normalized_column)
+    return normalized_column
 
 
 def df_columns_new_name_mapping(columns):
@@ -1918,17 +1920,20 @@ class TableConfig:
         dataset = self.getTableAttr('dataset')
         return "staging_{}".format(dataset) if os.getenv("USE_STAGING_BQ", "no") == 'yes' else dataset
 
-    def getMergeColumns(self):
-        return self.getTableAttr('mergeColumns', [])
-
-    def getIndexColumns(self):
-        return self.getTableAttr('indexColumns', [])
-
     def getLoadMethod(self):
         return self.getTableAttr('loadMethod', 'merge')
 
-    def getPartitionColumn(self):
-        return self.getTableAttr('partitionColumn', None)
-
     def getClusterColumn(self):
         return self.getTableAttr('clusterColumn', None)
+
+    def getMergeColumns(self):
+        mergeColumns = self.getReportAttr('mergeColumns', [])
+        return normalize_column_name(mergeColumns) if mergeColumns else []
+
+    def getIndexColumns(self):
+        indexColumns = self.getReportAttr('indexColumns', [])
+        return normalize_column_name(indexColumns) if indexColumns else []
+
+    def getPartitionColumn(self):
+        partitionColumn = self.getReportAttr('partitionColumn')
+        return normalize_column_name(partitionColumn) if partitionColumn else None
