@@ -23,17 +23,17 @@ class Constant:
     # reports & entities table names
     ADS_PORTFOLIO = 'portfolio'
     ADS_CAMPAIGN = 'campaign'
+    ADS_CAMPAIGN_PLACEMENT = 'campaign_placement'
     ADS_ADGROUP = 'adgroup'
     ADS_KEYWORD = 'keyword'
     ADS_TARGET = 'target'
     ADS_AD = 'ad'
     ADS_PRODUCTAD = 'productad'
-
-    ADS_CAMPAIGN_PLACEMENT = 'campaign_placement'
-    ADS_CAMPAIGN_V2 = 'campaign_v2'
     ADS_ADVERTISED_PRODUCT = 'advertised_product'
     ADS_PURCHASED_PRODUCT = 'purchased_product'
     ADS_SEARCH_TERM = 'search_term'
+    
+    ADS_CAMPAIGN_V2 = 'campaign_v2'
     ADS_INVENTORY = 'inventory'
     ADS_AUDIENCE = 'audience'
     ADS_CREATIVE = 'creative'

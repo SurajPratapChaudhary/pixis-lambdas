@@ -14,6 +14,7 @@ import pyarrow.parquet as Parquet
 import pyarrow as pa
 import json
 import psycopg2
+from psycopg2 import sql
 
 from Helpers.GoogleCloud import GoogleCloud
 from Helpers.LoadEntitiesToBigquery import LoadEntitiesToBigquery
@@ -337,7 +338,7 @@ class AdsApiEntitiesProcessor(BaseFileProcessor):
         )
         try:
             with conn, conn.cursor() as cur:
-                cur.execute(f'CREATE SCHEMA IF NOT EXISTS "{schema_name}"')
+                # cur.execute(f'CREATE SCHEMA IF NOT EXISTS "{schema_name}"')
                 # Create temporary staging table with same structure as target in session temp schema
                 cur.execute(f'CREATE TEMP TABLE "{staging_table}" (LIKE "{schema_name}"."{target_table}" INCLUDING ALL) ON COMMIT DROP')
                 # Build COPY column list from TableConfig schema (normalized names), preserve CSV order and exclude id
@@ -379,14 +380,19 @@ class AdsApiEntitiesProcessor(BaseFileProcessor):
             self.printlog("Executing INSERT from staging to target")
             cur.execute(insert_sql)
             return
-
+    
         # Ensure a unique index exists for upsert keys (optional but recommended)
-        idx = f'{target_table}_bk_uniq'
-        idx_cols = ", ".join([f'"{c}"' for c in key_cols])
-        # try:
-        #     cur.execute(f'CREATE UNIQUE INDEX IF NOT EXISTS "{idx}" ON "{target_schema_name}"."{target_table}" ({idx_cols})')
-        # except Exception as e:
-        #     self.printlog(f"Warning: could not ensure unique index for upsert keys {key_cols}: {e}")
+        merge_cols_sql = sql.SQL(", ").join([sql.Identifier(col) for col in key_cols])
+        unique_index_name = f"{target_table}__unique_idx"
+        self.printlog(f"Creating unique index {unique_index_name} on {target_schema_name}.{target_table} with columns {merge_cols_sql}")
+        cur.execute(
+            sql.SQL("CREATE UNIQUE INDEX IF NOT EXISTS {} ON {}.{} ({})").format(
+                sql.Identifier(unique_index_name),
+                sql.Identifier(target_schema_name),
+                sql.Identifier(target_table),
+                merge_cols_sql,
+            )
+        )
 
         # Build ON CONFLICT DO UPDATE clause
         if non_key_cols:
@@ -395,13 +401,15 @@ class AdsApiEntitiesProcessor(BaseFileProcessor):
             # No non-key columns -> do nothing on conflict
             set_clause = ""
 
+        # Format key columns for ON CONFLICT clause
+        conflict_cols_sql = sql.SQL(", ").join([sql.Identifier(col) for col in key_cols])
         upsert_sql = (
             f'INSERT INTO "{target_schema_name}"."{target_table}" ({insert_cols_sql}) '
             f'SELECT {insert_cols_sql} FROM "{staging_table}" '
-            f'ON CONFLICT ({idx_cols}) '
+            f'ON CONFLICT ({conflict_cols_sql}) '
             + (f'DO UPDATE SET {set_clause}' if set_clause else 'DO NOTHING')
         )
-        self.printlog(f"Executing UPSERT with keys {key_cols}")
+        self.printlog(f"Executing UPSERT with keys {conflict_cols_sql}")
         cur.execute(upsert_sql)
 
     def process(self):

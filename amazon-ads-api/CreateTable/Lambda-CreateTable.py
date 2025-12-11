@@ -46,7 +46,12 @@ class BigQuery(object):
         for bucket in buckets:
             print(f" - {bucket.name}")
 
-    def create_table(self, dataset, tableName, schema, partitionColumn=None, clusterColumn=None):
+    def create_table(self, tableName, tableConfig):
+
+        dataset = tableConfig.getDataset()
+        schema = tableConfig.getSchema()
+        partitionColumn = tableConfig.getPartitionColumn()
+        clusterColumn = tableConfig.getClusterColumn()
 
         full_table_id = self.get_full_table_id(table_name=tableName, dataset_id=dataset)
         bq_schema = []
@@ -164,12 +169,12 @@ def dispatch_etl_jobs(profile_id):
 def lambda_handler(event, context):
 
     if 'channel_type' not in event:
-        event['channel_type'] = ''
+        event['channel_type'] = 'amazon'
 
     channel_type = event['channel_type']
-    if channel_type == '':
-        print("Channel type is not specified to create tables.")
-        return
+    # if channel_type == '':
+    #     print("Channel type is not specified to create tables.")
+    #     return
 
     if 'account_id' not in event:
         event['account_id'] = ''
@@ -232,6 +237,7 @@ def lambda_handler(event, context):
                     tableConfig = TableConfig(table_type, ad_type, table_name=tableName)
 
                     tableName = tableConfig.getTableName()
+                    indexColumns = tableConfig.getIndexColumns()
                     if table_type != Constant.TBL_TYPE_GENERAL:
                         tableName = "{}_{}".format(tableName, account_id)
 
@@ -239,11 +245,8 @@ def lambda_handler(event, context):
                     if action == 'delete-create_table':
                         ops.delete_table(table_name=tableName, dataset=tableConfig.getDataset())
                     ops.create_table(
-                        dataset=tableConfig.getDataset(),
                         tableName=tableName,
-                        schema=tableConfig.getSchema(),
-                        partitionColumn=tableConfig.getPartitionColumn(),
-                        clusterColumn=tableConfig.getClusterColumn()
+                        tableConfig=tableConfig
                     )
 
     # elif action == 'fix_schema':

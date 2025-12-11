@@ -1,5 +1,6 @@
 import os
 from contextlib import contextmanager
+from includes.reports import *
 
 try:
     import psycopg2
@@ -61,12 +62,17 @@ class PostgresOps(object):
                     )
                 )
 
-    def create_table(self, dataset: str, tableName: str, schema: dict, partitionColumn: str = None, clusterColumn=None):
+    def create_table(self, tableName: str, tableConfig: TableConfig):
         """
         Create schema (if needed) and table with given columns.
         Optionally, create an index on partitionColumn if provided.
         """
-        schema_name = dataset
+        schema_name = tableConfig.getDataset()
+        schema = tableConfig.getSchema()
+        indexColumns = tableConfig.getIndexColumns()
+        loadMethod = tableConfig.getLoadMethod()
+        mergeColumns = tableConfig.getMergeColumns()
+
         table_name = tableName
 
         self._ensure_schema(schema_name)
@@ -89,15 +95,38 @@ class PostgresOps(object):
                 print(f"Creating PG table {schema_name}.{table_name}")
                 cur.execute(create_table_stmt)
 
-                if partitionColumn is not None:
-                    # Create index on the partition column to support time-based queries
-                    index_name = f"{table_name}_{partitionColumn}_idx"
+                for indexColumn in indexColumns:
+                    # Create index on the index column(s) single column or composite column
+                    if isinstance(indexColumn, list):
+                        # Composite index - multiple columns
+                        index_cols = [sql.Identifier(col) for col in indexColumn]
+                        index_name = f"{table_name}_{'_'.join(indexColumn)}_idx"
+                        index_columns_sql = sql.SQL(", ").join(index_cols)
+                    else:
+                        # Single column index
+                        index_name = f"{table_name}_{indexColumn}_idx"
+                        index_columns_sql = sql.Identifier(indexColumn)
+                    print(f"Creating index {index_name} on {schema_name}.{table_name} with columns {index_columns_sql}")
                     cur.execute(
                         sql.SQL("CREATE INDEX IF NOT EXISTS {} ON {}.{} ({})").format(
                             sql.Identifier(index_name),
                             sql.Identifier(schema_name),
                             sql.Identifier(table_name),
-                            sql.Identifier(partitionColumn),
+                            index_columns_sql,
+                        )
+                    )
+
+                # Create unique index on mergeColumns if loadMethod is 'merge'
+                if loadMethod == 'merge' and mergeColumns:
+                    merge_cols_sql = sql.SQL(", ").join([sql.Identifier(col) for col in mergeColumns])
+                    unique_index_name = f"{table_name}__unique_idx"
+                    print(f"Creating unique index {unique_index_name} on {schema_name}.{table_name} with columns {merge_cols_sql}")
+                    cur.execute(
+                        sql.SQL("CREATE UNIQUE INDEX IF NOT EXISTS {} ON {}.{} ({})").format(
+                            sql.Identifier(unique_index_name),
+                            sql.Identifier(schema_name),
+                            sql.Identifier(table_name),
+                            merge_cols_sql,
                         )
                     )
 
