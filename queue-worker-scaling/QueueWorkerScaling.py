@@ -114,5 +114,6 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Queue Worker Scaling")
     args = parser.parse_args()
+    
     event = {}
     lambda_handler(event, "abc")
